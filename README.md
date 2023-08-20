@@ -1,3 +1,7 @@
+---
+description: Clone for Team 1nf1n1ty
+---
+
 # HackTricks
 
 <figure><img src=".gitbook/assets/hacktricks.gif" alt=""><figcaption></figcaption></figure>
