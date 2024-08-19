@@ -1,16 +1,19 @@
 # macOS Office Sandbox Bypasses
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
 ### Word Sandbox bypass via Launch Agents
 
@@ -22,11 +25,11 @@ Check the [**original report here**](https://www.mdsec.co.uk/2018/08/escaping-th
 
 ### Word Sandbox bypass via Login Items and zip
 
-(Remember that from the first escape, Word can write arbitrary files whose name start with `~$`).
+Remember that from the first escape, Word can write arbitrary files whose name start with `~$` although after the patch of the previous vuln it wasn't possible to write in `/Library/Application Scripts` or in `/Library/LaunchAgents`.
 
 It was discovered that from within the sandbox it's possible to create a **Login Item** (apps that will be executed when the user logs in). However, these apps **won't execute unless** they are **notarized** and it's **not possible to add args** (so you cannot just run a reverse shell using **`bash`**).
 
-From the previous Sandbox bypass, Microsoft disabled the option to write files in `~/Library/LaunchAgents`. However, it was discovered that if you put a **zip file as a Login Item** the `Archive Utility` will just **unzip** it on its current location. So, because by default the folder `LaunchAgents` from `~/Library` is not created, it was possible to **zip a plist in `LaunchAgents/~$escape.plist`** and **place** the zip file in **`~/Library`** so when decompress it will reach the persitence destination.
+From the previous Sandbox bypass, Microsoft disabled the option to write files in `~/Library/LaunchAgents`. However, it was discovered that if you put a **zip file as a Login Item** the `Archive Utility` will just **unzip** it on its current location. So, because by default the folder `LaunchAgents` from `~/Library` is not created, it was possible to **zip a plist in `LaunchAgents/~$escape.plist`** and **place** the zip file in **`~/Library`** so when decompress it will reach the persistence destination.
 
 Check the [**original report here**](https://objective-see.org/blog/blog\_0x4B.html).
 
@@ -36,7 +39,7 @@ Check the [**original report here**](https://objective-see.org/blog/blog\_0x4B.h
 
 However, the previous technique had a limitation, if the folder **`~/Library/LaunchAgents`** exists because some other software created it, it would fail. So a different Login Items chain was discovered for this.
 
-An attacker could crate the the files **`.bash_profile`** and **`.zshenv`** with the payload to execute and then zip them and **write the zip in the victims** user folder: \~/\~$escape.zip.
+An attacker could create the the files **`.bash_profile`** and **`.zshenv`** with the payload to execute and then zip them and **write the zip in the victims** user folder: **`~/~$escape.zip`**.
 
 Then, add the zip file to the **Login Items** and then the **`Terminal`** app. When the user relogins, the zip file would be uncompressed in the users file, overwriting **`.bash_profile`** and **`.zshenv`** and therefore, the terminal will execute one of these files (depending if bash or zsh is used).
 
@@ -59,14 +62,17 @@ The thing is that even if **`python`** was signed by Apple, it **won't execute**
 1. Drop a **`~$exploit.py`** file with arbitrary Python commands.
 2. Run _open_ **`–stdin='~$exploit.py' -a Python`**, which runs the Python app with our dropped file serving as its standard input. Python happily runs our code, and since it’s a child process of _launchd_, it isn’t bound to Word’s sandbox rules.
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

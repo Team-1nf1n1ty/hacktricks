@@ -1,36 +1,49 @@
 # AppArmor
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
+
+### [WhiteIntel](https://whiteintel.io)
+
+<figure><img src="../../../.gitbook/assets/image (1227).png" alt=""><figcaption></figcaption></figure>
+
+[**WhiteIntel**](https://whiteintel.io) is a **dark-web** fueled search engine that offers **free** functionalities to check if a company or its customers have been **compromised** by **stealer malwares**.
+
+Their primary goal of WhiteIntel is to combat account takeovers and ransomware attacks resulting from information-stealing malware.
+
+You can check their website and try their engine for **free** at:
+
+{% embed url="https://whiteintel.io" %}
+
+***
 
 ## Basic Information
 
-**AppArmor** is a kernel enhancement to confine **programs** to a **limited** set of **resources** with **per-program profiles**. Profiles can **allow** **capabilities** like network access, raw socket access, and the permission to read, write, or execute files on matching paths.
+AppArmor is a **kernel enhancement designed to restrict the resources available to programs through per-program profiles**, effectively implementing Mandatory Access Control (MAC) by tying access control attributes directly to programs instead of users. This system operates by **loading profiles into the kernel**, usually during boot, and these profiles dictate what resources a program can access, such as network connections, raw socket access, and file permissions.
 
-It's a Mandatory Access Control or **MAC** that binds **access control** attributes **to programs rather than to users**.\
-AppArmor confinement is provided via **profiles loaded into the kernel**, typically on boot.\
-AppArmor profiles can be in one of **two modes**:
+There are two operational modes for AppArmor profiles:
 
-* **Enforcement**: Profiles loaded in enforcement mode will result in **enforcement of the policy** defined in the profile **as well as reporting** policy violation attempts (either via syslog or auditd).
-* **Complain**: Profiles in complain mode **will not enforce policy** but instead **report** policy **violation** attempts.
+* **Enforcement Mode**: This mode actively enforces the policies defined within the profile, blocking actions that violate these policies and logging any attempts to breach them through systems like syslog or auditd.
+* **Complain Mode**: Unlike enforcement mode, complain mode does not block actions that go against the profile's policies. Instead, it logs these attempts as policy violations without enforcing restrictions.
 
-AppArmor differs from some other MAC systems on Linux: it is **path-based**, it allows mixing of enforcement and complain mode profiles, it uses include files to ease development, and it has a far lower barrier to entry than other popular MAC systems.
+### Components of AppArmor
 
-### Parts of AppArmor
-
-* **Kernel module**: Does the actual work
-* **Policies**: Defines the behaviour and containment
-* **Parser**: Loads the policies into kernel
-* **Utilities**: Usermode programs to interact with apparmor
+* **Kernel Module**: Responsible for the enforcement of policies.
+* **Policies**: Specify the rules and restrictions for program behavior and resource access.
+* **Parser**: Loads policies into the kernel for enforcement or reporting.
+* **Utilities**: These are user-mode programs that provide an interface for interacting with and managing AppArmor.
 
 ### Profiles path
 
@@ -308,14 +321,29 @@ chmod +x /tmp/test.pl
 /tmp/test.pl
 ```
 
+### [WhiteIntel](https://whiteintel.io)
+
+<figure><img src="../../../.gitbook/assets/image (1227).png" alt=""><figcaption></figcaption></figure>
+
+[**WhiteIntel**](https://whiteintel.io) is a **dark-web** fueled search engine that offers **free** functionalities to check if a company or its customers have been **compromised** by **stealer malwares**.
+
+Their primary goal of WhiteIntel is to combat account takeovers and ransomware attacks resulting from information-stealing malware.
+
+You can check their website and try their engine for **free** at:
+
+{% embed url="https://whiteintel.io" %}
+
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

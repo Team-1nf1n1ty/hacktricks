@@ -1,39 +1,49 @@
 # macOS MDM
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
+
+**To learn about macOS MDMs check:**
+
+* [https://www.youtube.com/watch?v=ku8jZe-MHUU](https://www.youtube.com/watch?v=ku8jZe-MHUU)
+* [https://duo.com/labs/research/mdm-me-maybe](https://duo.com/labs/research/mdm-me-maybe)
 
 ## Basics
 
-### What is MDM (Mobile Device Management)?
+### **MDM (Mobile Device Management) Overview**
 
-[Mobile Device Management](https://en.wikipedia.org/wiki/Mobile\_device\_management) (MDM) is a technology commonly used to **administer end-user computing devices** such as mobile phones, laptops, desktops and tablets. In the case of Apple platforms like iOS, macOS and tvOS, it refers to a specific set of features, APIs and techniques used by administrators to manage these devices. Management of devices via MDM requires a compatible commercial or open-source MDM server that implements support for the [MDM Protocol](https://developer.apple.com/enterprise/documentation/MDM-Protocol-Reference.pdf).
+[Mobile Device Management](https://en.wikipedia.org/wiki/Mobile\_device\_management) (MDM) is utilized for overseeing various end-user devices like smartphones, laptops, and tablets. Particularly for Apple's platforms (iOS, macOS, tvOS), it involves a set of specialized features, APIs, and practices. The operation of MDM hinges on a compatible MDM server, which is either commercially available or open-source, and must support the [MDM Protocol](https://developer.apple.com/enterprise/documentation/MDM-Protocol-Reference.pdf). Key points include:
 
-* A way to achieve **centralized device management**
-* Requires an **MDM server** which implements support for the MDM protocol
-* MDM server can **send MDM commands**, such as remote wipe or “install this config”
+* Centralized control over devices.
+* Dependence on an MDM server that adheres to the MDM protocol.
+* Capability of the MDM server to dispatch various commands to devices, for instance, remote data erasure or configuration installation.
 
-### Basics What is DEP (Device Enrolment Program)?
+### **Basics of DEP (Device Enrollment Program)**
 
-The [Device Enrollment Program](https://www.apple.com/business/site/docs/DEP\_Guide.pdf) (DEP) is a service offered by Apple that **simplifies** Mobile Device Management (MDM) **enrollment** by offering **zero-touch configuration** of iOS, macOS, and tvOS devices. Unlike more traditional deployment methods, which require the end-user or administrator to take action to configure a device, or manually enroll with an MDM server, DEP aims to bootstrap this process, **allowing the user to unbox a new Apple device and have it configured for use in the organization almost immediately**.
+The [Device Enrollment Program](https://www.apple.com/business/site/docs/DEP\_Guide.pdf) (DEP) offered by Apple streamlines the integration of Mobile Device Management (MDM) by facilitating zero-touch configuration for iOS, macOS, and tvOS devices. DEP automates the enrollment process, allowing devices to be operational right out of the box, with minimal user or administrative intervention. Essential aspects include:
 
-Administrators can leverage DEP to automatically enroll devices in their organization’s MDM server. Once a device is enrolled, **in many cases it is treated as a “trusted”** device owned by the organization, and could receive any number of certificates, applications, WiFi passwords, VPN configurations [and so on](https://developer.apple.com/enterprise/documentation/Configuration-Profile-Reference.pdf).
+* Enables devices to autonomously register with a pre-defined MDM server upon initial activation.
+* Primarily beneficial for brand-new devices, but also applicable for devices undergoing reconfiguration.
+* Facilitates a straightforward setup, making devices ready for organizational use swiftly.
 
-* Allows a device to automatically enroll in pre-configured MDM server the **first time it’s powered** on
-* Most useful when the **device** is **brand new**
-* Can also be useful for **reprovisioning** workflows (**wiped** with fresh install of the OS)
+### **Security Consideration**
+
+It's crucial to note that the ease of enrollment provided by DEP, while beneficial, can also pose security risks. If protective measures are not adequately enforced for MDM enrollment, attackers might exploit this streamlined process to register their device on the organization's MDM server, masquerading as a corporate device.
 
 {% hint style="danger" %}
-Unfortunately, if an organization has not taken additional steps to **protect their MDM enrollment**, a simplified end-user enrollment process through DEP can also mean a simplified process for **attackers to enroll a device of their choosing in the organization’s MDM** server, assuming the "identity" of a corporate device.
+**Security Alert**: Simplified DEP enrollment could potentially allow unauthorized device registration on the organization's MDM server if proper safeguards are not in place.
 {% endhint %}
 
 ### Basics What is SCEP (Simple Certificate Enrolment Protocol)?
@@ -95,7 +105,7 @@ Apple devices manufactured after 2010 generally have **12-character alphanumeric
 6. Profile installation (Device) a. incl. MDM, SCEP and root CA payloads
 7. MDM command issuance (Device)
 
-![](<../../../.gitbook/assets/image (564).png>)
+![](<../../../.gitbook/assets/image (694).png>)
 
 The file `/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/System/Library/PrivateFrameworks/ConfigurationProfiles.framework/ConfigurationProfiles.tbd` exports functions that can be considered **high-level "steps"** of the enrolment process.
 
@@ -103,7 +113,7 @@ The file `/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/System/Librar
 
 This part of the process occurs when a **user boots a Mac for the first time** (or after a complete wipe)
 
-![](<../../../.gitbook/assets/image (568).png>)
+![](<../../../.gitbook/assets/image (1044).png>)
 
 or when executing `sudo profiles show -type enrollment`
 
@@ -128,7 +138,7 @@ It follows a few steps to get the Activation Record performed by **`MCTeslaConfi
    2. The JSON payload is encrypted using Absinthe (**`NACSign`**)
    3. All requests over HTTPs, built-in root certificates are used
 
-![](<../../../.gitbook/assets/image (566).png>)
+![](<../../../.gitbook/assets/image (566) (1).png>)
 
 The response is a JSON dictionary with some important data like:
 
@@ -137,7 +147,7 @@ The response is a JSON dictionary with some important data like:
 
 ### **Step 5: Profile Retrieval**
 
-![](<../../../.gitbook/assets/image (567).png>)
+![](<../../../.gitbook/assets/image (444).png>)
 
 * Request sent to **url provided in DEP profile**.
 * **Anchor certificates** are used to **evaluate trust** if provided.
@@ -148,7 +158,7 @@ The response is a JSON dictionary with some important data like:
 * Signed using the **device identity certificate (from APNS)**
 * **Certificate chain** includes expired **Apple iPhone Device CA**
 
-![](<../../../.gitbook/assets/image (567) (1) (2) (2) (2) (2) (2) (2) (2) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (7).png>)
+![](<../../../.gitbook/assets/image (567) (1) (2) (2) (2) (2) (2) (2) (2) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (1) (2) (2).png>)
 
 ### Step 6: Profile Installation
 
@@ -205,19 +215,17 @@ Therefore, this could be a dangerous entrypoint for attackers if the enrolment p
 [enrolling-devices-in-other-organisations.md](enrolling-devices-in-other-organisations.md)
 {% endcontent-ref %}
 
-## **References**
-
-* [https://www.youtube.com/watch?v=ku8jZe-MHUU](https://www.youtube.com/watch?v=ku8jZe-MHUU)
-* [https://duo.com/labs/research/mdm-me-maybe](https://duo.com/labs/research/mdm-me-maybe)
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

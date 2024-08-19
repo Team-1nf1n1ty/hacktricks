@@ -1,22 +1,25 @@
 # macOS Sandbox
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
 ## Basic Information
 
 MacOS Sandbox (initially called Seatbelt) **limits applications** running inside the sandbox to the **allowed actions specified in the Sandbox profile** the app is running with. This helps to ensure that **the application will be accessing only expected resources**.
 
-Any app with the **entitlement** **`com.apple.security.app-sandbox`** will be executed inside the sandbox. **Apple binaries** are usually executed inside a Sanbox and in order to publish inside the **App Store**, **this entitlement is mandatory**. So most applications will be executed inside the sandbox.
+Any app with the **entitlement** **`com.apple.security.app-sandbox`** will be executed inside the sandbox. **Apple binaries** are usually executed inside a Sandbox and in order to publish inside the **App Store**, **this entitlement is mandatory**. So most applications will be executed inside the sandbox.
 
 In order to control what a process can or cannot do the **Sandbox has hooks** in all **syscalls** across the kernel. **Depending** on the **entitlements** of the app the Sandbox will **allow** certain actions.
 
@@ -27,7 +30,7 @@ Some important components of the Sandbox are:
 * A **daemon** running in userland `/usr/libexec/sandboxd`
 * The **containers** `~/Library/Containers`
 
-Inside the containers folder you can find **a folder for each app executed sanboxed** with the name of the bundle id:
+Inside the containers folder you can find **a folder for each app executed sandboxed** with the name of the bundle id:
 
 ```bash
 ls -l ~/Library/Containers
@@ -73,6 +76,11 @@ Note that even if the symlinks are there to "escape" from the Sandbox and access
 # Get permissions
 plutil -convert xml1 .com.apple.containermanagerd.metadata.plist -o -
 
+# Binary sandbox profile
+<key>SandboxProfileData</key>
+<data>
+AAAhAboBAAAAAAgAAABZAO4B5AHjBMkEQAUPBSsGPwsgASABHgEgASABHwEf...
+		
 # In this file you can find the entitlements:
 <key>Entitlements</key>
 	<dict>
@@ -82,6 +90,11 @@ plutil -convert xml1 .com.apple.containermanagerd.metadata.plist -o -
 		<true/>
 		<key>com.apple.appattest.spi</key>
 		<true/>
+		<key>keychain-access-groups</key>
+		<array>
+			<string>6N38VWS5BX.ru.keepcoder.Telegram</string>
+			<string>6N38VWS5BX.ru.keepcoder.TelegramShare</string>
+		</array>
 [...]
 
 # Some parameters
@@ -102,12 +115,18 @@ plutil -convert xml1 .com.apple.containermanagerd.metadata.plist -o -
 		<string>/Users/username/Documents</string>
 		<string>/Users/username/Library/Calendars</string>
 		<string>/Users/username/Desktop</string>
+<key>RedirectedPaths</key>
+	<array/>
 [...]
 ```
 
+{% hint style="warning" %}
+Everything created/modified by a Sandboxed application will get the **quarantine attribut**e. This will prevent a sandbox space by triggering Gatekeeper if the sandbox app tries to execute something with **`open`**.
+{% endhint %}
+
 ### Sandbox Profiles
 
-The Sandbox profiles are configuration files that indicates what is going to be **allowed/forbidden** in that **Sandbox**. It uses the **Sandbox Profile Language (SBPL)**, which uses the [**Scheme**](https://en.wikipedia.org/wiki/Scheme\_\(programming\_language\)) programming language.
+The Sandbox profiles are configuration files that indicate what is going to be **allowed/forbidden** in that **Sandbox**. It uses the **Sandbox Profile Language (SBPL)**, which uses the [**Scheme**](https://en.wikipedia.org/wiki/Scheme\_\(programming\_language\)) programming language.
 
 Here you can find an example:
 
@@ -212,9 +231,19 @@ Bypasses examples:
 * [https://lapcatsoftware.com/articles/sandbox-escape.html](https://lapcatsoftware.com/articles/sandbox-escape.html)
 * [https://desi-jarvis.medium.com/office365-macos-sandbox-escape-fcce4fa4123c](https://desi-jarvis.medium.com/office365-macos-sandbox-escape-fcce4fa4123c) (they are able to write files outside the sandbox whose name starts with `~$`).
 
+### MacOS Sandbox Profiles
+
+macOS stores system sandbox profiles in two locations: **/usr/share/sandbox/** and **/System/Library/Sandbox/Profiles**.
+
+And if a third-party application carry the _**com.apple.security.app-sandbox**_ entitlement, the system applies the **/System/Library/Sandbox/Profiles/application.sb** profile to that process.
+
+### **iOS Sandbox Profile**
+
+The default profile is called **container** and we don't have the SBPL text representation. In memory, this sandbox is represented as Allow/Deny binary tree for each permissions from the sandbox.
+
 ### Debug & Bypass Sandbox
 
-**Processes are not born sandboxed on macOS: unlike iOS**, where the sandbox is applied by the kernel before the first instruction of a program executes, on macOS **a process must elect to place itself into the sandbox.**
+On macOS, unlike iOS where processes are sandboxed from the start by the kernel, **processes must opt-in to the sandbox themselves**. This means on macOS, a process is not restricted by the sandbox until it actively decides to enter it.
 
 Processes are automatically Sandboxed from userland when they start if they have the entitlement: `com.apple.security.app-sandbox`. For a detailed explanation of this process check:
 
@@ -224,7 +253,7 @@ Processes are automatically Sandboxed from userland when they start if they have
 
 ### **Check PID Privileges**
 
-[According to this](https://www.youtube.com/watch?v=mG715HcDgO8\&t=3011s), the **`sandbox_check`** (it's a `__mac_syscall`), can check **if an operation is allowed or not** by the sandbox in a certain PID.
+[**According to this**](https://www.youtube.com/watch?v=mG715HcDgO8\&t=3011s), the **`sandbox_check`** (it's a `__mac_syscall`), can check **if an operation is allowed or not** by the sandbox in a certain PID.
 
 The [**tool sbtool**](http://newosxbook.com/src.jl?tree=listings\&file=sbtool.c) can check if a PID can perform a certain action:
 
@@ -251,14 +280,17 @@ It's possible to check the definition of this entitlement in **`/System/Library/
 
 This will **eval the string after this entitlement** as an Sandbox profile.
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

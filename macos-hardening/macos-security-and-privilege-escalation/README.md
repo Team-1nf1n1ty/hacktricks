@@ -1,33 +1,34 @@
 # macOS Security & Privilege Escalation
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
-<figure><img src="../../.gitbook/assets/image (1) (3) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (380).png" alt=""><figcaption></figcaption></figure>
 
-**HackenProof is home to all crypto bug bounties.**
+Join [**HackenProof Discord**](https://discord.com/invite/N3FrSbmwdy) server to communicate with experienced hackers and bug bounty hunters!
 
-**Get rewarded without delays**\
-HackenProof bounties launch only when their customers deposit the reward budget. You'll get the reward after the bug is verified.
+**Hacking Insights**\
+Engage with content that delves into the thrill and challenges of hacking
 
-**Get experience in web3 pentesting**\
-Blockchain protocols and smart contracts are the new Internet! Master web3 security at its rising days.
+**Real-Time Hack News**\
+Keep up-to-date with fast-paced hacking world through real-time news and insights
 
-**Become the web3 hacker legend**\
-Gain reputation points with each verified bug and conquer the top of the weekly leaderboard.
+**Latest Announcements**\
+Stay informed with the newest bug bounties launching and crucial platform updates
 
-[**Sign up on HackenProof**](https://hackenproof.com/register) start earning from your hacks!
-
-{% embed url="https://hackenproof.com/register" %}
+**Join us on** [**Discord**](https://discord.com/invite/N3FrSbmwdy) and start collaborating with top hackers today!
 
 ## Basic MacOS
 
@@ -62,6 +63,9 @@ If you are not familiar with macOS, you should start learning the basics of macO
 {% content-ref url="macos-protocols.md" %}
 [macos-protocols.md](macos-protocols.md)
 {% endcontent-ref %}
+
+* **Opensource** macOS: [https://opensource.apple.com/](https://opensource.apple.com/)
+  * To download a `tar.gz` change a URL such as [https://opensource.apple.com/**source**/dyld/](https://opensource.apple.com/source/dyld/) to [https://opensource.apple.com/**tarballs**/dyld/**dyld-852.2.tar.gz**](https://opensource.apple.com/tarballs/dyld/dyld-852.2.tar.gz)
 
 ### MacOS MDM
 
@@ -103,14 +107,6 @@ For this kind of vulnerabilities don't forget to **check vulnerable `.pkg` insta
 [macos-installers-abuse.md](macos-files-folders-and-binaries/macos-installers-abuse.md)
 {% endcontent-ref %}
 
-### Entitlements and Privileges abuse via process abuse
-
-If a process can **inject code in another process with better privileges or entitlements** or contact it to perform privileges actions, he could escalate privileges and bypass defensive meassures such as [Sandbox](macos-security-protections/macos-sandbox/) or [TCC](macos-security-protections/macos-tcc/).
-
-{% content-ref url="macos-proces-abuse/" %}
-[macos-proces-abuse](macos-proces-abuse/)
-{% endcontent-ref %}
-
 ### File Extension & URL scheme app handlers
 
 Weird apps registered by file extensions could be abused and different applications can be register to open specific protocols
@@ -119,52 +115,23 @@ Weird apps registered by file extensions could be abused and different applicati
 [macos-file-extension-apps.md](macos-file-extension-apps.md)
 {% endcontent-ref %}
 
-## MacOS Privilege Escalation
+## macOS TCC / SIP Privilege Escalation
 
-### CVE-2020-9771 - mount\_apfs TCC bypass and privilege escalation
+In macOS **applications and binaries can have permissions** to access folders or settings that make them more privileged than others.
 
-**Any user** (even unprivileged ones) can create and mount a time machine snapshot an **access ALL the files** of that snapshot.\
-The **only privileged** needed is for the application used (like `Terminal`) to have **Full Disk Access** (FDA) access (`kTCCServiceSystemPolicyAllfiles`) which need to be granted by an admin.
+Therefore, an attacker that wants to successfully compromise a macOS machine will need to **escalate its TCC privileges** (or even **bypass SIP**, depending on his needs).
 
-{% code overflow="wrap" %}
-```bash
-# Create snapshot
-tmutil localsnapshot
+These privileges are usually given in the form of **entitlements** the application is signed with, or the application might requested some accesses and after the **user approving them** they can be found in the **TCC databases**. Another way a process can obtain these privileges is by being a **child of a process** with those **privileges** as they are usually **inherited**.
 
-# List snapshots
-tmutil listlocalsnapshots /
-Snapshots for disk /:
-com.apple.TimeMachine.2023-05-29-001751.local
+Follow these links to find different was to [**escalate privileges in TCC**](macos-security-protections/macos-tcc/#tcc-privesc-and-bypasses), to [**bypass TCC**](macos-security-protections/macos-tcc/macos-tcc-bypasses/) and how in the past [**SIP has been bypassed**](macos-security-protections/macos-sip.md#sip-bypasses).
 
-# Generate folder to mount it
-cd /tmp # I didn it from this folder
-mkdir /tmp/snap
+## macOS Traditional Privilege Escalation
 
-# Mount it, "noowners" will mount the folder so the current user can access everything
-/sbin/mount_apfs -o noowners -s com.apple.TimeMachine.2023-05-29-001751.local /System/Volumes/Data /tmp/snap
+Of course from a red teams perspective you should be also interested in escalating to root. Check the following post for some hints:
 
-# Access it
-ls /tmp/snap/Users/admin_user # This will work
-```
-{% endcode %}
-
-A more detailed explanation can be [**found in the original report**](https://theevilbit.github.io/posts/cve\_2020\_9771/)**.**
-
-### Sensitive Information
-
-{% content-ref url="macos-files-folders-and-binaries/macos-sensitive-locations.md" %}
-[macos-sensitive-locations.md](macos-files-folders-and-binaries/macos-sensitive-locations.md)
+{% content-ref url="macos-privilege-escalation.md" %}
+[macos-privilege-escalation.md](macos-privilege-escalation.md)
 {% endcontent-ref %}
-
-### Linux Privesc
-
-First of all, please note that **most of the tricks about privilege escalation affecting Linux/Unix will affect also MacOS** machines. So see:
-
-{% content-ref url="../../linux-hardening/privilege-escalation/" %}
-[privilege-escalation](../../linux-hardening/privilege-escalation/)
-{% endcontent-ref %}
-
-## MacOS Defensive Apps
 
 ## References
 
@@ -174,31 +141,32 @@ First of all, please note that **most of the tricks about privilege escalation a
 * [**https://assets.sentinelone.com/c/sentinal-one-mac-os-?x=FvGtLJ**](https://assets.sentinelone.com/c/sentinal-one-mac-os-?x=FvGtLJ)
 * [**https://www.youtube.com/watch?v=vMGiplQtjTY**](https://www.youtube.com/watch?v=vMGiplQtjTY)
 
-<figure><img src="../../.gitbook/assets/image (1) (3) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (380).png" alt=""><figcaption></figcaption></figure>
 
-**HackenProof is home to all crypto bug bounties.**
+Join [**HackenProof Discord**](https://discord.com/invite/N3FrSbmwdy) server to communicate with experienced hackers and bug bounty hunters!
 
-**Get rewarded without delays**\
-HackenProof bounties launch only when their customers deposit the reward budget. You'll get the reward after the bug is verified.
+**Hacking Insights**\
+Engage with content that delves into the thrill and challenges of hacking
 
-**Get experience in web3 pentesting**\
-Blockchain protocols and smart contracts are the new Internet! Master web3 security at its rising days.
+**Real-Time Hack News**\
+Keep up-to-date with fast-paced hacking world through real-time news and insights
 
-**Become the web3 hacker legend**\
-Gain reputation points with each verified bug and conquer the top of the weekly leaderboard.
+**Latest Announcements**\
+Stay informed with the newest bug bounties launching and crucial platform updates
 
-[**Sign up on HackenProof**](https://hackenproof.com/register) start earning from your hacks!
+**Join us on** [**Discord**](https://discord.com/invite/N3FrSbmwdy) and start collaborating with top hackers today!
 
-{% embed url="https://hackenproof.com/register" %}
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}

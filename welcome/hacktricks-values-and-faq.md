@@ -1,16 +1,19 @@
-# HackTricks Values & faq
+# HackTricks Values & FAQ
+
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
 
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
 
 ## HackTricks Values
 
@@ -44,7 +47,7 @@ And don't forget to **give a star in the Github projects!** (Find the links belo
 * **How can I contribute to the project?**
 {% endhint %}
 
-You can **share new tips and tricks with the community or fix bugs** you find in the books sending a **Pull Request** to the respective Github pages:&#x20;
+You can **share new tips and tricks with the community or fix bugs** you find in the books sending a **Pull Request** to the respective Github pages:
 
 * [https://github.com/carlospolop/hacktricks](https://github.com/carlospolop/hacktricks)
 * [https://github.com/carlospolop/hacktricks-cloud](https://github.com/carlospolop/hacktricks-cloud)
@@ -56,6 +59,22 @@ Don't forget to **give a star in the Github projects!**
 {% endhint %}
 
 Yes, you can, but **don't forget to mention the specific link(s)** where the content was taken from.
+
+{% hint style="success" %}
+* **How can I cite a page of HackTricks?**
+{% endhint %}
+
+As long as the link **of** the page(s) were you took the information from appears it's enough.\
+If you need a bibtex you can use something like:
+
+```latex
+@misc{hacktricks-bibtexing,
+  author = {"HackTricks Team" or the Authors name of the specific page/trick},
+  title = {Title of the Specific Page},
+  year = {Year of Last Update (check it at the end of the page)},
+  url = {\url{https://book.hacktricks.xyz/specific-page}},
+}
+```
 
 {% hint style="warning" %}
 * **Can I copy all HackTricks in my blog?**
@@ -69,7 +88,7 @@ If you fear that it will disappear, just fork it in Github or download it, as I 
 * **Why do you have sponsors? Are HackTricks books for commercial purposes?**
 {% endhint %}
 
-The first **HacTricks** **value** is to offer **FREE** hacking educational resources to **ALL** the world. The HackTricks team has **dedicated thousands of hours** to offer this content, again, for **FREE**.
+The first **HackTricks** **value** is to offer **FREE** hacking educational resources to **ALL** the world. The HackTricks team has **dedicated thousands of hours** to offer this content, again, for **FREE**.
 
 If you think HackTricks books are made for **commercial purposes** you are **COMPLETELY WRONG**.
 
@@ -87,14 +106,42 @@ You won't find HackTricks filled with annoying ads like other blogs with much le
 * **What should I do if there is content from my blog in HackTricks and I don't want it there?**
 {% endhint %}
 
-In any case know that HackTricks in this case would be improving your **SEO** and **encouraging** people to **check your page**. If you still want the content of your blog to be removed from HackTricks let us know.
+Note that having links to your page in HackTricks:
 
-Note that asking this we will definitely **remove every link to your blog**, but if the same technique can be found in other web pages we will just change the source of the information and the explanation, so the real content won't probably leave HackTricks (in cybersecurity, in general, there are always several post talking about the same technique).
+* Improve your **SEO**
+* The content gets **translated to more than 15 languages** making possible for more people to access this content
+* **HackTricks encourages** people to **check your page** (several people has mentioned us that since some page of them is in HackTricks they receive more visits)
 
-## License
+However, If you still want the content of your blog to be removed from HackTricks just let us know and we will definitely **remove every link to your blog**, and any content based on it.
 
-**Copyright © Carlos Polop 2023. Except where otherwise specified (the external information copied into the book belongs to the original authors), the text on** [**HACK TRICKS**](https://github.com/carlospolop/hacktricks) **by Carlos Polop is licensed under the**[ **Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**](https://creativecommons.org/licenses/by-nc/4.0/)**.**\
-**If you want to use it with commercial purposes, contact me.**
+{% hint style="danger" %}
+* **What should I do if I find copy-pasted content in HackTricks?**
+{% endhint %}
+
+We always **give the original authors all the credits**. If you find a page with copy-pasted content without original source referenced, let us know and we will either **remove it**, **add the link before the text**, or **rewrite it adding the link**.
+
+## LICENSE
+
+Copyright © All rights reserved unless otherwise specified.
+
+#### License Summary:
+
+* Attribution: You are free to:
+  * Share — copy and redistribute the material in any medium or format.
+  * Adapt — remix, transform, and build upon the material.
+
+#### Additional Terms:
+
+* Third-Party Content: Some parts of this blog/book may include content from other sources, such as excerpts from other blogs or publications. The use of such content is done under the principles of fair use or with explicit permission from the respective copyright holders. Please refer to the original sources for specific licensing information regarding third-party content.
+* Authorship: The original content authored by HackTricks is subject to the terms of this license. You are encouraged to attribute this work to the author when sharing or adapting it.
+
+#### Exemptions:
+
+* Commercial Use: For inquiries regarding commercial use of this content, please contact me.
+
+This license does not grant any trademark or branding rights in relation to the content. All trademarks and branding featured in this blog/book are the property of their respective owners.
+
+**By accessing or using HackTricks, you agree to abide by the terms of this license. If you do not agree with these terms, please, do not access this website.**
 
 ## **Disclaimer**
 
@@ -110,14 +157,17 @@ The user is solely responsible for any actions taken based on the information co
 By using this book, the user agrees to release the authors and publishers from any and all liability and responsibility for any damages, losses, or harm that may result from the use of this book or any of the information contained within it.
 {% endhint %}
 
+{% hint style="success" %}
+Learn & practice AWS Hacking:<img src="/.gitbook/assets/arte.png" alt="" data-size="line">[**HackTricks Training AWS Red Team Expert (ARTE)**](https://training.hacktricks.xyz/courses/arte)<img src="/.gitbook/assets/arte.png" alt="" data-size="line">\
+Learn & practice GCP Hacking: <img src="/.gitbook/assets/grte.png" alt="" data-size="line">[**HackTricks Training GCP Red Team Expert (GRTE)**<img src="/.gitbook/assets/grte.png" alt="" data-size="line">](https://training.hacktricks.xyz/courses/grte)
+
 <details>
 
-<summary><a href="https://cloud.hacktricks.xyz/pentesting-cloud/pentesting-cloud-methodology"><strong>☁️ HackTricks Cloud ☁️</strong></a> -<a href="https://twitter.com/hacktricks_live"><strong>🐦 Twitter 🐦</strong></a> - <a href="https://www.twitch.tv/hacktricks_live/schedule"><strong>🎙️ Twitch 🎙️</strong></a> - <a href="https://www.youtube.com/@hacktricks_LIVE"><strong>🎥 Youtube 🎥</strong></a></summary>
+<summary>Support HackTricks</summary>
 
-* Do you work in a **cybersecurity company**? Do you want to see your **company advertised in HackTricks**? or do you want to have access to the **latest version of the PEASS or download HackTricks in PDF**? Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* **Join the** [**💬**](https://emojipedia.org/speech-balloon/) [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** me on **Twitter** [**🐦**](https://github.com/carlospolop/hacktricks/tree/7af18b62b3bdc423e11444677a6a73d4043511e9/\[https:/emojipedia.org/bird/README.md)[**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**hacktricks repo**](https://github.com/carlospolop/hacktricks) **and** [**hacktricks-cloud repo**](https://github.com/carlospolop/hacktricks-cloud).
+* Check the [**subscription plans**](https://github.com/sponsors/carlospolop)!
+* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@hacktricks\_live**](https://twitter.com/hacktricks\_live)**.**
+* **Share hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
 
 </details>
+{% endhint %}
